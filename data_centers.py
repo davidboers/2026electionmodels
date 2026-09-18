@@ -1,0 +1,23 @@
+data_center_counties = [
+    'Clayton',
+    'Coweta',
+    'Douglas',
+    'Early',
+    'Effingham',
+    'Fayette',
+    'Fulton',
+    'Henry',
+    'Irwin',
+    'McDuffie',
+    'Muscogee',
+    'Newton',
+    'Richmond',
+    'Rockdale',
+    'Spalding',
+    'Troup',
+    'Twiggs',
+    'Whitfield',
+    # Cancelled
+    'Jones',
+    'Monroe',
+]
