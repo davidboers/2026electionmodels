@@ -8,9 +8,6 @@ import matplotlib.colors as mcolors
 import utils
 
 
-metro_counties = ['Gwinnett', 'Fulton']
-
-
 def project(df: pd.DataFrame, prev_cands, new_cands, swing_map):
     prev_reg_totals = df[prev_cands].sum()
 

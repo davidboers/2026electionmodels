@@ -15,13 +15,20 @@ statewide_races_2022 = [
     'Commissioner of Labor',
 ]
 
-def compile(file, races, year, write=False):
+
+def compile(file, races, year, metro_prec_data=pd.DataFrame(columns=['County']), write=False):
     df = pd.read_json(file, typ='series')
     df = sos.prepare_export_df(df, filter_unreported=False)
 
     counties = df['localResults']['shortName'].tolist()
     index = pd.MultiIndex.from_tuples(utils.make_tuple_matrix(counties, sos.vote_methods), names=['County', 'Vote Method'])
-    out_files = {race: pd.DataFrame(index=index) for race in races}
+    out_files = {
+        race: {
+            'County': pd.DataFrame(index=index),
+            'Metro': pd.DataFrame()
+        } 
+        for race in races
+    }
 
     for county in counties:
         ballotItems = df['localResults'].set_index('shortName')['ballotItems'][county]
@@ -53,9 +60,14 @@ def compile(file, races, year, write=False):
                     if count is None:
                         obfuscated = True
                         count = 0
-                    out_data.loc[(county, method), candidate1] = count
+                    out_data['County'].loc[(county, method), candidate1] = count
                 if obfuscated:
                     print(f'{county} County {method} results for {race} appear to be obfuscated')
+
+            # Handle metro-ATL precincts
+            if county in metro_prec_data['County'].unique():
+                precincts = metro_prec_data[metro_prec_data['County'] == county]
+                out_data['Metro'] = ballotOptions['precinctResults']
 
     if write:
         for race, out_data in out_files.items():
