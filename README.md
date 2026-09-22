@@ -4,3 +4,9 @@
 - [2022 general election](https://results.sos.ga.gov/cdn/results/Georgia/export-2022NovGen.json)
 - [Jan. 2021 senate runoffs](https://results.sos.ga.gov/cdn/results/Georgia/export-2021JanFedRun.json)
 - [2018 general election](https://results.sos.ga.gov/cdn/results/Georgia/export-2018NovGen.json)
+
+# Todo list
+
+- Congressional races
+- State legislative battlegrounds
+- Election night timeline benchmarks
