@@ -28,6 +28,3 @@ def import_county_map():
     counties['name'] = counties['name'].apply(sanitize_name)
     counties = counties.set_index('name')
     return counties
-
-def format_county_plt():
-    pass
