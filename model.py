@@ -36,13 +36,17 @@ def project(df: pd.DataFrame, prev_cands, new_cands, swing_map):
     reg_proj['Swing'] = reg_proj['New Share (Filtered)'] - reg_proj['Previous Share (Filtered)']
     reg_proj['Share'] = reg_proj['Previous Votes'] / reg_proj['Previous Votes'].sum() * 100 + reg_proj['Swing']
 
-    # Project vote
-    growth_ratio = new_reg_results_f['Votes'].sum() / prev_reg_results_f['Votes'].sum()
+    # Growth ratio
+    prev_vote_total = prev_reg_results_f['Votes'].sum()
+    growth_ratio = new_reg_results_f['Votes'].sum() / prev_vote_total if prev_vote_total != 0 else 0
     proj_reg_vote_total = prev_reg_totals.sum() * growth_ratio
+
+    # Project vote
     reg_proj['Votes'] = (reg_proj['Share'] / 100 * proj_reg_vote_total).round()
-    reg_proj['Current'] = curr_reg_totals
+    reg_proj['Current'] = new_reg_results_f['Votes']
     return reg_proj[['Previous Votes', 'Current', 'Votes']]\
         .rename(columns={'Previous Votes': 'Previous', 'Votes': 'Projection'})\
+        .fillna(0)\
         .astype(int)
 
 
