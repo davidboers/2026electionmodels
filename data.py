@@ -80,6 +80,7 @@ def compile(file, races, year, metro_prec_data=pd.DataFrame(columns=['County']),
             
 
 if __name__ == '__main__':
+    # Do not delete (need for git repo)
     compile('export-2025Special.json', ['PSC - District 3'], '2025', True)
     compile('export-2022NovGen.json', statewide_races_2022, '2022', True)
     compile('export-2021JanFedRun.json', ['US Senate (Perdue)'], '2021', True)

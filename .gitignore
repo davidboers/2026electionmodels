@@ -1,3 +1,4 @@
 export*
 sketchbook.ods
 data/*
+!data/cong_w_counties2024.csv

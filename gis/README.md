@@ -13,3 +13,4 @@
   - For GIS, see the Cobb and Cherokee source above.
 - Henry County precincts 2026: [here](https://hcboc.maps.arcgis.com/apps/webappviewer/index.html?id=779ff4ff6a7b48768b745d3a1fedeed5)
 - Historical precinct maps: [here](https://www.legis.ga.gov/joint-office/reapportionment)
+- Counties within Congressional Districts (`cong_w_counties.zip`): [here](https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html)
