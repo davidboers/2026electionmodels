@@ -35,11 +35,13 @@ def dial(wedges: np.ndarray, colors: np.ndarray, fulcrum: tuple[float, float] = 
         upto_part += wedge['Proportion']
 
     # Markings
+    mark_w = 0.005
     def draw(angle, height, s = None):
         (x, y) = fulcrum
-        x1 = x + (np.cos(angle) * r)
-        y1 = y + (np.sin(angle) * r)
-        mark = Rectangle((x1, y1), width=0.005, height=height, angle=np.degrees(angle) + 90,
+        offset = (mark_w / 2) / (2 * np.pi * r) * (2 * np.pi)
+        x1 = x + (np.cos(angle + offset) * r)
+        y1 = y + (np.sin(angle + offset) * r)
+        mark = Rectangle((x1, y1), width=mark_w, height=height, angle=np.degrees(angle) + 90,
                             color='black')
         ax.add_patch(mark)
 
@@ -48,20 +50,30 @@ def dial(wedges: np.ndarray, colors: np.ndarray, fulcrum: tuple[float, float] = 
             y2 = y + (np.sin(angle) * r * 1.1)
             ax.text(x2, y2, s=s, horizontalalignment='center', verticalalignment='center')
 
-    markw = 0.07
-    for i in range(1, sidelen + 1, 1):
-        height = markw if i % 2 == 0 else markw / 2
+    markh = 0.07
+    (step, mark_n) = {
+        5: (1, 1),
+        10: (1, 2),
+        15: (1, 3),
+        20: (2, 4),
+        25: (2, 4), # icky
+        30: (2, 3),
+        35: (2, 4),
+        40: (4, 8),
+    }[sidelen]
+    for i in range(step, sidelen + step, step):
+        height = markh if i % mark_n == 0 else markh / 2
         ang_p = (i / sidelen * (np.pi / 2))
         angle1 = (np.pi / 2) - ang_p
         angle2 = (np.pi / 2) + ang_p
 
-        draw(angle1, height, i if i % 2 == 0 else None)
-        draw(angle2, height, i if i % 2 == 0 else None)
+        draw(angle1, height, i if i % mark_n == 0 else None)
+        draw(angle2, height, i if i % mark_n == 0 else None)
 
-    draw(np.pi / 2, markw, '0')
+    draw(np.pi / 2, markh, '0')
 
     # Middle and pointer
-    mid = Wedge(fulcrum, r=r - markw, theta1=0, theta2=180, color='#f0f0f0')
+    mid = Wedge(fulcrum, r=r - markh, theta1=0, theta2=180, color='#f0f0f0')
     ax.add_patch(mid)
 
     if swing is not None:
@@ -76,20 +88,6 @@ def dial(wedges: np.ndarray, colors: np.ndarray, fulcrum: tuple[float, float] = 
                     np.sin(angle) * r + fulcrum[1]), 
                     r=r, theta1=theta1, theta2=theta2, color=fu_color)
         ax.add_patch(pnt)
-
-    # Annotations
-    annotations = [-4.62]
-    outer_r = r * 1.3
-    inner_r = r * 1.15
-
-    for ann in annotations:
-        angle = swing_to_angle(ann, sidelen)
-        x1 = np.cos(angle) * outer_r + fulcrum[0]
-        y1 = np.sin(angle) * outer_r + fulcrum[1]
-        x2 = np.cos(angle) * inner_r + fulcrum[0]
-        y2 = np.sin(angle) * inner_r + fulcrum[1]
-        arr = Arrow(x1, y1, x2 - x1, y2 - y1, width=markw)
-        ax.add_patch(arr)
 
     # End
     if autolim:

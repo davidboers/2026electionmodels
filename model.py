@@ -15,7 +15,7 @@ def project(df: pd.DataFrame, prev_cands, new_cands, swing_map):
             out.loc[to_c, 'Votes'] = prev_reg_totals[from_c]
         out['Share'] = out['Votes'] / out['Votes'].sum() * 100
         out['Swing'] = 0
-        return out
+        return out.rename(columns={'Votes': 'Projection'})
     prev_reg_results_f = pd.DataFrame(filtered[prev_cands].sum(), columns=['Votes'])
     new_reg_results_f = pd.DataFrame(filtered[new_cands].sum(), columns=['Votes'])
     prev_reg_results_f['Share'] = prev_reg_results_f['Votes'] / prev_reg_results_f['Votes'].sum() * 100

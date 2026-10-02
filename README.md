@@ -7,6 +7,6 @@
 
 # Todo list
 
-- Congressional races
 - State legislative battlegrounds
-- Election night timeline benchmarks
+
+There are two models I am using to predict the final results on Election Night, one is a Regional Swing Model used to predict the final vote total for each candidate. The other, called a Range model, is used to determine whether the number of votes awaiting tabulation is enough to change the outcome.
