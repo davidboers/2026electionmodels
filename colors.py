@@ -3,6 +3,45 @@ import matplotlib.colors as mcolors
 from matplotlib import colormaps as mcolormaps
 
 
+def party_name(candidate_tag: str):
+    return candidate_tag[-4:-1]
+
+
+strong_party_colors = {
+    'Rep': 'crimson',
+    'Dem': 'royalblue',
+    'Lib': 'orange',
+    'Runoff': 'gray'
+}
+
+light_party_colors = {
+    'Rep': 'salmon',
+    'Dem': 'cadetblue',
+    'Lib': 'orange',
+    'Runoff': 'lightgray'
+}
+
+
+def color_for_cand(color_map: dict, cand):
+    party = party_name(cand)
+    try:
+        return color_map[party]
+
+    except KeyError:
+        return 'gray'
+
+
+def mk_listed_colormap(candidates, color_scheme, convert_to_party = True):
+    return mcolors.ListedColormap([
+        color_for_cand(color_scheme, cand) if convert_to_party else cand
+        for cand in candidates
+        ]
+    )
+
+
+# Gradients
+
+
 def gradient_pick(color: np.ndarray, ratio):
     color = color * 255.0
 

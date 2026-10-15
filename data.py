@@ -21,7 +21,7 @@ def compile(file, races, year, metro_prec_data=pd.DataFrame(columns=['County']),
     df = sos.prepare_export_df(df, filter_unreported=False)
 
     counties = df['localResults']['shortName'].tolist()
-    index = pd.MultiIndex.from_tuples(utils.make_tuple_matrix(counties, sos.vote_methods), names=['County', 'Vote Method'])
+    index = pd.MultiIndex.from_product([counties, sos.vote_methods], names=['County', 'Vote Method'])
     out_files = {
         race: {
             'County': pd.DataFrame(index=index),

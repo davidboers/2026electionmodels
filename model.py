@@ -3,7 +3,7 @@ from enum import Enum
 import pandas as pd
 
 
-def project(df: pd.DataFrame, prev_cands, new_cands, swing_map):
+def project(df: pd.DataFrame, swing_map):
     prev_reg_totals = df[prev_cands].sum()
     curr_reg_totals = df[new_cands].sum()
 

@@ -3,8 +3,14 @@ import numpy as np
 
 vote_methods = ['Election Day', 'Advance Voting', 'Absentee by Mail', 'Provisional']
 
-def combin_statuses(s1: str, s2: str):
+def combin_statuses2(s1: str, s2: str):
     if s1 == s2:
+        return s1
+
+    if not s1:
+        return s2
+
+    if not s2:
         return s1
 
     match (s1, s2):
@@ -28,6 +34,15 @@ def combin_statuses(s1: str, s2: str):
 
         case _:
             assert False
+
+
+def combin_statuses(statuses: list[str]):
+    s1 = statuses[0]
+
+    for si in statuses[1:]:
+        s1 = combin_statuses2(si, s1)
+
+    return s1
 
 
 def prepare_export_df(df: pd.DataFrame, filter_unreported=True, use_advanced=False, ext_rs=False):
@@ -55,7 +70,7 @@ def prepare_export_df(df: pd.DataFrame, filter_unreported=True, use_advanced=Fal
             for ballot_item in ballot_items:
                 if ballot_item in bis['name'].values:
                     for vote_method in vote_methods:
-                        bis.loc[bis['name'] == ballot_item, vote_method] = combin_statuses(bis.loc[bis['name'] == ballot_item, vote_method], reporting_statuses[vote_method])
+                        bis.loc[bis['name'] == ballot_item, vote_method] = combin_statuses2(bis.loc[bis['name'] == ballot_item, vote_method], reporting_statuses[vote_method])
     df['localResults'] = lr
     df['results']['ballotItems'] = bis
     return df
