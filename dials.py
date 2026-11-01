@@ -115,8 +115,8 @@ def dial_from_swing_required(swing_req: float, swing: float | None = None, ax = 
 
     if is_rep:
         # Rep on offense
-        wedge_widths = [50.0 - np.abs(swing_req), np.abs(swing_req), 50.0]
-        colors = ['gray' if gray_center else 'cadetblue', 'crimson', 'royalblue']
+        wedge_widths = [50.0, 50.0 - np.abs(swing_req), np.abs(swing_req)]
+        colors = ['royalblue', 'crimson', 'gray' if gray_center else 'cadetblue']
 
     else:
         # Dem on offense
@@ -127,6 +127,7 @@ def dial_from_swing_required(swing_req: float, swing: float | None = None, ax = 
         swing = -swing
 
     side_len = 50.0# if np.abs(swing_req) < 25.0 else 100.0 
+    # TODO: allow expansion
     major_ticks = np.arange(-side_len, side_len, 5.0) / 100
     minor_ticks = np.arange(-side_len, side_len, 1.0) / 100
     adj_swing = np.round(swing_req / 5) * 5

@@ -17,6 +17,7 @@ reporting_group_sets = [
     'Reporting Group (2018-2026)',
     'Reporting Group (2021-2026)',
     'Reporting Group (2022-2026)',
+    'Reporting Group (2024-2026)',
     'Reporting Group (2025-2026)',
 ]
 
