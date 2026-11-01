@@ -1,0 +1,42 @@
+<div class="embedded-content">
+<iframe src="https://dawieboers.com/2026-election-models/governor.html" title="Live election results" loading="eager" scrolling="no">
+</iframe>
+</div>
+
+
+
+.embedded-content {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0;
+    overflow: hidden;
+}
+
+.embedded-content iframe {
+    display: block;
+    width: 100%;
+    min-height: 900px;
+    height: 100vh;
+    border: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+
+
+document.addEventListener("DOMContentLoaded", function() {
+
+    const iframe = document.querySelector(
+        ".embedded-content iframe"
+    );
+
+    iframe.addEventListener("load", function() {
+        const doc = iframe.contentDocument;
+
+        iframe.style.height =
+            doc.documentElement.scrollHeight + "px";
+    });
+
+});

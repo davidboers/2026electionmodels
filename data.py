@@ -2,6 +2,7 @@ import pandas as pd
 
 import sos
 import utils
+import colors
 
 
 statewide_races_2022 = [
@@ -79,13 +80,56 @@ def compile(file, races, year, metro_prec_data=pd.DataFrame(columns=['County']),
     return out_files
             
 
+def import_chamber_data(race: str, pres2024: pd.DataFrame):
+    curr, candidates = sos.import_current(race, year=2024, by_method=False, all_precincts=True)
+    is_substitute = False
+    if len(candidates) == 1:
+        # Use 2024 results instead
+        is_substitute = True
+        mask = curr.index
+        curr = pres2024.loc[mask]
+        candidates = curr.columns
+    curr = curr[candidates]
+    nonmetro = curr.loc[~curr.index.get_level_values('County').isin(sos.metro_counties)]
+    nonmetro = nonmetro.groupby('County').sum()
+    nonmetro['Precinct'] = nonmetro.index
+    nonmetro = nonmetro.reset_index().set_index(['County', 'Precinct'])
+    curr = pd.concat([
+        curr.loc[curr.index.get_level_values('County').isin(sos.metro_counties)],
+        nonmetro
+    ])
+    curr = curr.rename(columns={cand: colors.party_name(cand) for cand in candidates})
+    curr['Race'] = race
+    curr['is_sub'] = is_substitute
+    curr = curr.reset_index().set_index(['Race', 'County', 'Precinct'])
+    return curr
+            
+
 if __name__ == '__main__':
     # Do not delete (need for git repo)
-    compile('export-2025Special.json', ['PSC - District 3'], '2025', True)
-    compile('export-2022NovGen.json', statewide_races_2022, '2022', True)
-    compile('export-2021JanFedRun.json', ['US Senate (Perdue)'], '2021', True)
-    compile('export-2018NovGen.json', ['Public Service Commission, District 5 - Western'], '2018', True)
+    #compile('export-2025Special.json', ['PSC - District 3'], '2025', True)
+    #compile('export-2022NovGen.json', statewide_races_2022, '2022', True)
+    #compile('export-2021JanFedRun.json', ['US Senate (Perdue)'], '2021', True)
+    #compile('export-2018NovGen.json', ['Public Service Commission, District 5 - Western'], '2018', True)
 
     # For tuning
-    statewide_races_2018 = [office.replace(' of ', ' Of ') for office in statewide_races_2022]
-    compile('export-2018NovGen.json', statewide_races_2018, '2018', True)
+    #statewide_races_2018 = [office.replace(' of ', ' Of ') for office in statewide_races_2022]
+    #compile('export-2018NovGen.json', statewide_races_2018, '2018', True)
+
+
+    pres2024, pres2024_candidates = sos.import_current('President of the US', year=2024, by_method=False, all_precincts=True)
+    pres2024 = pres2024[pres2024_candidates[:2]]
+
+    state_senate_2024 = []
+    for district_number in range(1, 57):
+        race = f'State Senate - District {district_number}'
+        curr = import_chamber_data(race, pres2024)
+        state_senate_2024.append(curr)
+    pd.concat(state_senate_2024).fillna(0).astype(int).to_csv('./data/state_senate_2024.csv')
+
+    state_house_2024 = []
+    for district_number in range(1, 181):
+        race = f'State House of Representatives - District {district_number}'
+        curr = import_chamber_data(race, pres2024)
+        state_house_2024.append(curr)
+    pd.concat(state_house_2024).fillna(0).astype(int).to_csv('./data/state_house_2024.csv')

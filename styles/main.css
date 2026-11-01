@@ -1,0 +1,52 @@
+*,
+*::before,
+*::after {
+    box-sizing: inherit;
+}
+
+body {
+    max-width: 100%;
+    color: #373737;
+    font: 15px "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+img,
+svg,
+canvas,
+video {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Tables */
+
+table {
+    border-collapse: collapse;
+}
+
+table th,
+table td {
+    padding: 2pt;
+}
+
+table th.row_heading {
+    text-align: right;
+}
+
+table td {
+    text-align: right;
+}
+
+thead tr {
+    background-color: lightslategray;
+}
+
+tbody tr:nth-child(even) {
+    background-color: lightgray;
+}
+
+tbody tr:nth-child(odd) {
+    background-color: whitesmoke;
+}
+
+

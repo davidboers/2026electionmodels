@@ -4,63 +4,29 @@ import pandas as pd
 import numpy as np
 
 
-def vote_counts(tallies: pd.Series, proj_votes_remaining: int = 0, runoff: bool = True):
-    victories = pd.DataFrame([['Possible', ''] for _ in tallies], index=tallies.index, columns=['Status', 'Notes'])
-    alternatives = pd.DataFrame(np.repeat(['Possible', ''], 2), index=['Runoff', 'Recount'], columns=['Status', 'Notes'])
+def remaining_votes_summary(current_tallies: pd.Series, projected_remaining: pd.Series):
+    total_votes = current_tallies.sum()
+    margin_v = current_tallies.max() - np.partition(current_tallies, -2)[-2]
+    quota = total_votes // 2 + 1
+    non_leading_candidates_v = total_votes - current_tallies.max()
 
-    if len(tallies) == 1:
-        victories['Status'] = 'Final'
-        victories['Notes'] = 'Only one candidate.'
-        alternatives['Status'] = 'Impossible'
-        alternatives['Notes'] = 'Only one candidate.'
+    if current_tallies.max() >= quota:
+        threshold_field_name = 'Votes required to force runoff'
+        threshold_field_value = current_tallies.max() - non_leading_candidates_v
 
     else:
-        votes_counted = tallies.sum()
-        projected_total = votes_counted + proj_votes_remaining
-        projected_quota = (projected_total // 2) + 1
-
-        if runoff:
-            pass
-
-
-    return victories.merge(alternatives)
-
-
-
-def declare(tallies: pd.Series, runoff: bool = True):
-    assert len(tallies) > 0
+        threshold_field_name = 'Votes required to avoid runoff'
+        threshold_field_value = non_leading_candidates_v - current_tallies.max() + 1 
 
     # Recount source: O.C.G.A. § 21-2-495(c)
+    recount_margin_limit = total_votes // 200 # Maximum vote margin allowing a recount (0.5%)
 
-    leader = tallies.index[0]
-    if len(tallies) == 1:
-        return (leader, False)
+    if margin_v <= recount_margin_limit and total_votes > 0:
+        print(f'Margin between two highest-performing candidates ({margin_v:,}) is within the range to force a recount '
+            f'({recount_margin_limit:,}; 0.5% of the total votes).')
 
-    else:
-        total_votes = tallies.sum()
-        quota = (total_votes // 2) + 1
-        recount_margin_limit = quota // 200 # Maximum vote margin allowing a recount (0.5%)
-
-        tallies = tallies.sort_values()
-        leader_v = tallies.index[0]
-        runner_up_v = tallies[1]
-        runner_up = tallies.index[1]
-
-        if leader_v == runner_up_v:
-            return ('Tie (Runoff)', True)
-
-        if runoff:
-            if leader_v >= quota:
-                margin = leader_v - runner_up_v
-                recount = margin <= recount_margin_limit
-                return (leader, recount)
-
-            else:
-                if len(tallies) >= 3:
-                    c3_v = tallies[2]
-                    recount = runner_up_v - c3_v <= recount_margin_limit
-                else:
-                    recount = False
-                return ('Runoff', recount)
-
-        
+    return pd.DataFrame(pd.Series({
+        'Votes required to swap places in count': margin_v + 1,
+        threshold_field_name: threshold_field_value,
+        'Estimated votes remaining': projected_remaining.sum()
+    }).astype(int)).style.format('{:,}')
