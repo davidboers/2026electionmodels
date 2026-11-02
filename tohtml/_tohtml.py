@@ -41,7 +41,12 @@ def mk_cell_code(cell):
 
 def mk_cell_output(output):
     if 'data' not in output:
-        print(output.keys())
+        if 'text' in output:
+            ''.join([f'<p>{para}</p>' for para in output['text']])
+
+        else:
+            print(output.keys())
+
         return ''
     
     data = output['data']
