@@ -92,7 +92,7 @@ def import_current(race_name: str, year = 2026, by_method: bool = False, all_pre
 
     summ_results = pd.DataFrame.from_records(df['results']['ballotItems'], index='name')
     id_list = summ_results['id']
-    race_id = id_list[race_name]
+    race_id = id_list.rename(lambda n: n.split('/')[0])[race_name]
 
     lr = pd.DataFrame.from_records(df['localResults'], index='name')
     bis = lr['ballotItems'].map(pd.DataFrame.from_records)
@@ -101,6 +101,8 @@ def import_current(race_name: str, year = 2026, by_method: bool = False, all_pre
     bis = pd.DataFrame(bis['ballotOptions'], index=bis.index)
 
     ballotOptionsLists = bis['ballotOptions'].apply(lambda bos: pd.DataFrame.from_records(bos, index='name'))
+
+    name_normalizer = lambda s: s.replace('(I)(Rep)', '(I) (Rep)').replace('(I)(Dem)', '(I) (Dem)')
 
 
     def transpose_row(county_name, bos: pd.Series):
@@ -114,7 +116,7 @@ def import_current(race_name: str, year = 2026, by_method: bool = False, all_pre
                 votes = pd.DataFrame({cand: l['groupResults'] for cand, l in precinct_lists.items()})
                 vote_counts = votes.map(lambda gr: pd.DataFrame.from_records(gr, index='groupName')['voteCount'])
                 return np.concat([[{'County': county_name_norm, 'Precinct': precinct, 'Vote Method': method, 'Reported?': False} 
-                                | {cand: gr[cand][method] for cand in gr.index}
+                                | {name_normalizer(cand): gr[cand][method] for cand in gr.index}
                                 for method in vote_methods] 
                                 for precinct, gr in vote_counts.iterrows()]).tolist()
 
@@ -122,18 +124,18 @@ def import_current(race_name: str, year = 2026, by_method: bool = False, all_pre
                 votes = pd.DataFrame({cand: l['voteCount'] for cand, l in precinct_lists.items()})
                 votes['Reported?'] = list(precinct_lists.values())[0]['reportingStatus'].isin(['Election Night Complete', 'Fully Reported'])
                 votes['County'] = county_name_norm
-                return [{'Precinct': precinct} | entry.to_dict() for precinct, entry in votes.iterrows()]
+                return [{'Precinct': precinct} | entry.rename(name_normalizer).to_dict() for precinct, entry in votes.iterrows()]
 
         else:
             vote_counts = bos['groupResults'].apply(lambda gr: pd.DataFrame.from_records(gr, index='groupName')['voteCount'])
             if by_method:
                 return [{'County': county_name_norm, 'Precinct': county_name_norm, 'Vote Method': method, 'Reported?': False} 
-                        | vote_counts[method].to_dict() 
+                        | vote_counts[method].rename(name_normalizer).to_dict() 
                         for method in vote_counts.columns]
 
             else:
                 return [{'County': county_name_norm, 'Precinct': county_name_norm, 'Reported?': False} 
-                        | vote_counts[vote_counts.columns].T.sum().to_dict()]
+                        | vote_counts[vote_counts.columns].rename(name_normalizer).T.sum().to_dict()]
                 
 
 

@@ -78,7 +78,7 @@ def mk_legislative_pages():
     proceed = True
     notebook_template = './other_temp.ipynb'
     senate_districts = [1, 6, 7, 9, 10, 14, 15, 16, 19, 21, 23, 24, 26, 27, 29, 30, 31, 32,
-                        36, 37, 38, 39, 40, 41, 42, 44, 45, 47, 48, 49, 50, 51, 53, 55, 56]
+                        36, 37, 38, 39, 40, 41, 42, 44, 45, 46, 47, 48, 49, 50, 51, 53, 55, 56]
     for dist_num in senate_districts:
         temporary_notebook = f'./tempnb_sd_{dist_num}.ipynb'
         final_page = f'./html/sd_{dist_num}.html'
